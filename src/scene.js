@@ -395,7 +395,7 @@ function setupScrollCamera() {
       const finalLook = new THREE.Vector3().copy(tLook);
       if (activeBeaconPos && maxWeight > 0) {
         // smoothstep/sine ease for focus transition
-        const easeW = gsap.utils.sineInOut(maxWeight);
+        const easeW = Math.sin((maxWeight * Math.PI) / 2);
         finalLook.lerp(activeBeaconPos, easeW * 0.75); // Blend up to 75% gaze focus
       }
 
