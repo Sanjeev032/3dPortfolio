@@ -241,21 +241,21 @@ export function initScene(canvas) {
   renderer.toneMapping       = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.3;
 
-  /* Scene — foggy early morning basecamp */
+  /* Scene — stable premium Arctic Frost theme */
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x080a10);
-  scene.fog = new THREE.FogExp2(0x080a10, 0.020); // High fog density at start
+  scene.background = new THREE.Color(0x080c10);
+  scene.fog = new THREE.FogExp2(0x080c10, 0.007); // Distant-only thin fog
 
   /* Camera */
   camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 900);
   camera.position.copy(CAM_PATH[0]);
   camera.lookAt(LOOK_PATH[0]);
 
-  /* Lighting — Arctic */
-  ambientLight = new THREE.AmbientLight(0x0a1220, 1.2);       // dim cool twilight ambient
+  /* Lighting — Stable Arctic Frost */
+  ambientLight = new THREE.AmbientLight(0x1a2d45, 2.2);       // stable cold blue ambient
   scene.add(ambientLight);
 
-  sunLight = new THREE.DirectionalLight(0x9ab7d3, 0.8);   // dim morning sun
+  sunLight = new THREE.DirectionalLight(0xc8e8ff, 2.8);   // stable icy white sun sun
   sunLight.position.set(60, 90, 40);
   scene.add(sunLight);
 
@@ -305,68 +305,6 @@ function setupScrollCamera() {
     onUpdate: (self) => {
       const t = self.progress;
       scrollProgress = t;
-
-      /* Evolve environment lighting & fog based on scroll progress t */
-      let fogD, fogCol, bgCol, ambCol, ambInt, sunCol, sunInt, peakCol;
-
-      const cBaseFog = new THREE.Color(0x080a10);
-      const cBaseBg  = new THREE.Color(0x080a10);
-      const cBaseAmb = new THREE.Color(0x0a1220);
-      const cBaseSun = new THREE.Color(0x9ab7d3);
-      const cBasePeak = new THREE.Color(0x4db8ff);
-
-      const cMidFog = new THREE.Color(0x0a1828);
-      const cMidBg  = new THREE.Color(0x0a1828);
-      const cMidAmb = new THREE.Color(0x1a2d45);
-      const cMidSun = new THREE.Color(0xd5eaff);
-      const cMidPeak = new THREE.Color(0x4db8ff);
-
-      const cSummitFog = new THREE.Color(0x180b06);
-      const cSummitBg  = new THREE.Color(0x180b06);
-      const cSummitAmb = new THREE.Color(0x2c160b);
-      const cSummitSun = new THREE.Color(0xffa844);
-      const cSummitPeak = new THREE.Color(0xffaa44);
-
-      if (t < 0.5) {
-        const factor = t / 0.5;
-        fogD   = THREE.MathUtils.lerp(0.020, 0.003, factor);
-        fogCol = new THREE.Color().copy(cBaseFog).lerp(cMidFog, factor);
-        bgCol  = new THREE.Color().copy(cBaseBg).lerp(cMidBg, factor);
-        ambCol = new THREE.Color().copy(cBaseAmb).lerp(cMidAmb, factor);
-        ambInt = THREE.MathUtils.lerp(1.2, 2.6, factor);
-        sunCol = new THREE.Color().copy(cBaseSun).lerp(cMidSun, factor);
-        sunInt = THREE.MathUtils.lerp(0.8, 3.0, factor);
-        peakCol = new THREE.Color().copy(cBasePeak).lerp(cMidPeak, factor);
-      } else {
-        const factor = (t - 0.5) / 0.5;
-        fogD   = THREE.MathUtils.lerp(0.003, 0.007, factor);
-        fogCol = new THREE.Color().copy(cMidFog).lerp(cSummitFog, factor);
-        bgCol  = new THREE.Color().copy(cMidBg).lerp(cSummitBg, factor);
-        ambCol = new THREE.Color().copy(cMidAmb).lerp(cSummitAmb, factor);
-        ambInt = THREE.MathUtils.lerp(2.6, 3.0, factor);
-        sunCol = new THREE.Color().copy(cMidSun).lerp(cSummitSun, factor);
-        sunInt = THREE.MathUtils.lerp(3.0, 4.2, factor);
-        peakCol = new THREE.Color().copy(cMidPeak).lerp(cSummitPeak, factor);
-      }
-
-      /* Apply transitions */
-      if (scene && renderer) {
-        scene.fog.color.copy(fogCol);
-        scene.fog.density = fogD;
-        scene.background.copy(bgCol);
-        
-        if (ambientLight) {
-          ambientLight.color.copy(ambCol);
-          ambientLight.intensity = ambInt;
-        }
-        if (sunLight) {
-          sunLight.color.copy(sunCol);
-          sunLight.intensity = sunInt;
-        }
-        if (peakLight) {
-          peakLight.color.copy(peakCol);
-        }
-      }
 
       /* Camera position */
       const tPos = camCurve.getPoint(Math.min(t, 0.999));
