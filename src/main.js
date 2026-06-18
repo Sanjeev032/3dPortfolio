@@ -50,6 +50,7 @@ async function init() {
   setupScrollAnimations();
   setupContactForm();
   setupCheckpointHUD();
+  setupRecruiterNav();
 
   /* 5 — Hide loading screen & entrance */
   setTimeout(() => {
@@ -525,6 +526,61 @@ function updateCheckpointHUD(t) {
     hud.classList.add('active');
   } else {
     hud.classList.remove('active');
+  }
+}
+
+/* ════════════════════════════════════════
+   RECRUITER NAV PANEL
+════════════════════════════════════════ */
+function setupRecruiterNav() {
+  const btns = document.querySelectorAll('.recruiter-nav-btn');
+  
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.target;
+      const target = document.getElementById(targetId) || document.querySelector(`.${targetId}`);
+      if (target) {
+        // Snappy, smooth glide animation along the mountain spline path
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+
+  // Track active states on scroll
+  window.addEventListener('portfolio-scroll', () => {
+    updateRecruiterActiveState();
+  });
+  window.addEventListener('scroll', () => {
+    updateRecruiterActiveState();
+  });
+}
+
+function updateRecruiterActiveState() {
+  const btns = document.querySelectorAll('.recruiter-nav-btn');
+  let activeBtn = null;
+  let minDistance = Infinity;
+
+  btns.forEach(btn => {
+    const targetId = btn.dataset.target;
+    let selector = `#${targetId}`;
+    if (targetId === 'skills-card' || targetId === 'contact-card') {
+      selector = `.${targetId}`;
+    }
+    const target = document.querySelector(selector);
+    
+    if (target) {
+      const rect = target.getBoundingClientRect();
+      const dist = Math.abs(rect.top - window.innerHeight / 3);
+      if (dist < minDistance) {
+        minDistance = dist;
+        activeBtn = btn;
+      }
+    }
+  });
+
+  if (activeBtn) {
+    btns.forEach(b => b.classList.remove('active'));
+    activeBtn.classList.add('active');
   }
 }
 
