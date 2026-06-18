@@ -129,7 +129,7 @@ function projectCard(p) {
              role="button" tabindex="0" aria-label="Open details for ${p.name}">
       <div class="stone-header">
         <div class="stone-level-dot ${p.level}" title="${p.level}" aria-hidden="true"></div>
-        <div class="stone-stars" aria-label="${p.stars} stars">⭐ ${p.stars}</div>
+        <span class="stone-level-label ${p.level}">${p.level}</span>
       </div>
       <div class="stone-name">${prettify(p.name)}</div>
       <p class="stone-desc">${p.description}</p>
@@ -252,7 +252,7 @@ function openModal(p) {
     [...(p.topics || []), p.language].filter(Boolean)
       .map(t => `<span class="tag-pill">${t}</span>`).join('');
 
-  document.getElementById('modal-stars').textContent   = `⭐ ${p.stars}`;
+  document.getElementById('modal-stars').textContent   = '';
   document.getElementById('modal-updated').textContent = p.updated;
   document.getElementById('modal-lang').textContent    = p.language || 'N/A';
 
