@@ -17,6 +17,7 @@ let snowParticles, animId;
 let currentLookAt = new THREE.Vector3(0, 20, 0);
 let milestoneBeacons = [];
 let ambientLight, sunLight, peakLight, frostLight, baseLight;
+let scrollProgress = 0;
 
 /* ────────────────────────────────────────────────
    fBm (Fractal Brownian Motion) noise — no deps
@@ -146,6 +147,16 @@ function buildMilestoneBeacons() {
   // Timeline markers coordinates match data.js position attributes
   const targetTValues = [0.22, 0.35, 0.48, 0.60, 0.72, 0.85];
 
+  // Progressive platform sizes representing growth (Radius, Height)
+  const platformSizes = [
+    { r: 1.5, h: 0.3 }, // 2022 (Beginner)
+    { r: 2.5, h: 0.4 }, // 2023 (Intermediate)
+    { r: 3.4, h: 0.5 }, // 2024 (Advanced)
+    { r: 4.8, h: 0.6 }, // 2025 (MERN Development)
+    { r: 5.6, h: 0.7 }, // 2025 (SDE Internship)
+    { r: 6.8, h: 0.9 }  // 2026 (Mastery & Summit)
+  ];
+
   milestones.forEach((m, idx) => {
     const p = m.pos;
     if (!p) return;
@@ -165,6 +176,18 @@ function buildMilestoneBeacons() {
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = Math.PI / 2;
     beaconGroup.add(ring);
+
+    // 3D Stone Platform - Tapered cylinder, larger platforms at higher altitudes
+    const size = platformSizes[idx] || { r: 1.5, h: 0.3 };
+    const platformGeo = new THREE.CylinderGeometry(size.r, size.r + 0.4, size.h, 18);
+    const platformMat = new THREE.MeshStandardMaterial({
+      color: 0x141e2d,
+      roughness: 0.85,
+      metalness: 0.25
+    });
+    const platform = new THREE.Mesh(platformGeo, platformMat);
+    platform.position.y = -size.h / 2 - 0.2;
+    beaconGroup.add(platform);
 
     // Light line extending down to ground (anchor line)
     const lineGeo = new THREE.BufferGeometry().setFromPoints([
@@ -281,6 +304,7 @@ function setupScrollCamera() {
     end:      'bottom bottom',
     onUpdate: (self) => {
       const t = self.progress;
+      scrollProgress = t;
 
       /* Evolve environment lighting & fog based on scroll progress t */
       let fogD, fogCol, bgCol, ambCol, ambInt, sunCol, sunInt, peakCol;
@@ -436,8 +460,14 @@ function animate() {
     });
   }
 
-  /* Camera look-at */
-  camera.lookAt(currentLookAt);
+  /* Camera look-at with cinematic horizontal sway */
+  const swayX = Math.sin(t * 0.45) * (0.6 + scrollProgress * 1.6);
+  const swayY = Math.cos(t * 0.3) * (0.3 + scrollProgress * 0.9);
+  const cinematicLookAt = new THREE.Vector3()
+    .copy(currentLookAt)
+    .add(new THREE.Vector3(swayX, swayY, 0));
+
+  camera.lookAt(cinematicLookAt);
 
   renderer.render(scene, camera);
 }

@@ -27,27 +27,38 @@ export function getLangColor(lang) {
 
 /* Categorise a repo into experience level */
 function categorise(topics = [], stars = 0, name = '') {
+  const n = name.toLowerCase();
+
+  // Explicit mappings based on user request
+  if (n.includes('mindly') || n.includes('llm-output-verification') || n.includes('llm output verification') || n.includes('pahunn')) {
+    return 'production';
+  }
+  if (n.includes('peace') || n.includes('sanctuary')) {
+    return 'advanced';
+  }
+  if (n.includes('gips') || n.includes('route-planner') || n.includes('route planner') || n.includes('m-travel') || n.includes('m travel') || n.includes('one-cosmetics') || n.includes('one cosmetics') || n.includes('cosmetics')) {
+    return 'intermediate';
+  }
+
+  // Default heuristic triggers
   const t = [...topics, name].join(' ').toLowerCase();
 
-  // Production signals
   if (
     t.includes('production') || t.includes('enterprise') ||
     t.includes('ai') || t.includes('llm') || t.includes('rag') ||
-    t.includes('openai') || t.includes('langchain') || stars >= 10
+    t.includes('openai') || t.includes('langchain') || stars >= 12
   ) return 'production';
 
-  // Advanced signals
   if (
     t.includes('advanced') || t.includes('fullstack') ||
     t.includes('full-stack') || t.includes('websocket') ||
-    t.includes('docker') || t.includes('microservice') || stars >= 5
+    t.includes('docker') || t.includes('microservice') || stars >= 6
   ) return 'advanced';
 
-  // Intermediate
   if (
     t.includes('intermediate') || t.includes('api') ||
     t.includes('react') || t.includes('nextjs') ||
-    t.includes('express') || stars >= 2
+    t.includes('express') || stars >= 3
   ) return 'intermediate';
 
   return 'beginner';
