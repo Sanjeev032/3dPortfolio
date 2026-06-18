@@ -49,6 +49,7 @@ async function init() {
   setupNavDots();
   setupScrollAnimations();
   setupContactForm();
+  setupCheckpointHUD();
 
   /* 5 — Hide loading screen & entrance */
   setTimeout(() => {
@@ -455,6 +456,76 @@ function setupDroneCursor() {
     el.addEventListener('mouseenter', () => gsap.to(svg, { scale:1.45, duration:0.2 }));
     el.addEventListener('mouseleave', () => gsap.to(svg, { scale:1,    duration:0.2 }));
   });
+}
+
+/* ════════════════════════════════════════
+   CHECKPOINT HUD
+════════════════════════════════════════ */
+const MILESTONE_TRIGGERS = [
+  { t: 0.22, index: 0 },
+  { t: 0.35, index: 1 },
+  { t: 0.48, index: 2 },
+  { t: 0.60, index: 3 },
+  { t: 0.72, index: 4 },
+  { t: 0.85, index: 5 }
+];
+
+function setupCheckpointHUD() {
+  window.addEventListener('portfolio-scroll', (e) => {
+    const t = e.detail.t;
+    updateCheckpointHUD(t);
+  });
+}
+
+function updateCheckpointHUD(t) {
+  const hud = document.getElementById('checkpoint-hud');
+  if (!hud) return;
+
+  const trigger = MILESTONE_TRIGGERS.find(trig => Math.abs(t - trig.t) < 0.055);
+
+  if (trigger) {
+    const m = milestones[trigger.index];
+    
+    document.getElementById('hud-year').textContent = m.year;
+    
+    const badge = document.getElementById('hud-level-badge');
+    badge.textContent = m.level;
+    badge.className = `hud-badge ${m.level}`;
+    
+    document.getElementById('hud-title').textContent = m.role;
+    document.getElementById('hud-company').textContent = m.company;
+    document.getElementById('hud-desc').textContent = m.description;
+    
+    const related = allProjects
+      .filter(p => p.level === m.level)
+      .slice(0, 2);
+    
+    const projContainer = document.getElementById('hud-projects');
+    if (related.length > 0) {
+      projContainer.innerHTML = `
+        <div class="hud-proj-title">Connected Projects</div>
+        ${related.map(p => `
+          <a href="#" class="hud-proj-link" data-id="${p.id}">
+            <span>${prettify(p.name)}</span>
+            <span>→</span>
+          </a>
+        `).join('')}
+      `;
+      projContainer.querySelectorAll('.hud-proj-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const proj = allProjects.find(p => String(p.id) === String(link.dataset.id));
+          if (proj) openModal(proj);
+        });
+      });
+    } else {
+      projContainer.innerHTML = '';
+    }
+    
+    hud.classList.add('active');
+  } else {
+    hud.classList.remove('active');
+  }
 }
 
 /* ════════════════════════════════════════

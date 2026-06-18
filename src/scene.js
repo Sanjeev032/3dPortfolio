@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { milestones } from './data.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,6 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
 let renderer, scene, camera;
 let snowParticles, animId;
 let currentLookAt = new THREE.Vector3(0, 20, 0);
+let milestoneBeacons = [];
 
 /* ────────────────────────────────────────────────
    fBm (Fractal Brownian Motion) noise — no deps
@@ -134,6 +136,58 @@ function buildStars(count = 3500) {
 }
 
 /* ────────────────────────────────────────────────
+   Milestone Beacons
+──────────────────────────────────────────────── */
+function buildMilestoneBeacons() {
+  const group = new THREE.Group();
+  milestoneBeacons = []; // reset
+
+  // Timeline markers coordinates match data.js position attributes
+  const targetTValues = [0.22, 0.35, 0.48, 0.60, 0.72, 0.85];
+
+  milestones.forEach((m, idx) => {
+    const p = m.pos;
+    if (!p) return;
+
+    const beaconGroup = new THREE.Group();
+    beaconGroup.position.set(p.x, p.y, p.z);
+
+    // Glowing core sphere
+    const sphereGeo = new THREE.SphereGeometry(0.5, 16, 16);
+    const sphereMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.9 });
+    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+    beaconGroup.add(sphere);
+
+    // Pulsing outer ring
+    const ringGeo = new THREE.TorusGeometry(1.0, 0.08, 8, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.5 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    beaconGroup.add(ring);
+
+    // Light line extending down to ground (anchor line)
+    const lineGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, -18, 0)
+    ]);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x4db8ff, transparent: true, opacity: 0.35 });
+    const line = new THREE.Line(lineGeo, lineMat);
+    beaconGroup.add(line);
+
+    group.add(beaconGroup);
+    milestoneBeacons.push({
+      group: beaconGroup,
+      ring,
+      sphere,
+      targetT: targetTValues[idx] || 0.5,
+      pos: new THREE.Vector3(p.x, p.y, p.z)
+    });
+  });
+
+  return group;
+}
+
+/* ────────────────────────────────────────────────
    Camera Path Waypoints
    (valley base → summit, each scene = one step)
 ──────────────────────────────────────────────── */
@@ -198,6 +252,7 @@ export function initScene(canvas) {
   /* Objects */
   scene.add(buildStars());
   scene.add(buildTerrain());
+  scene.add(buildMilestoneBeacons());
   snowParticles = buildSnow();
   scene.add(snowParticles);
 
@@ -234,9 +289,31 @@ function setupScrollCamera() {
 
       /* Look-at target */
       const tLook = lookCurve.getPoint(Math.min(t, 0.999));
+      
+      // Look for the closest milestone beacon to shift camera focus briefly
+      let activeBeaconPos = null;
+      let maxWeight = 0;
+      milestoneBeacons.forEach(b => {
+        const dist = Math.abs(t - b.targetT);
+        if (dist < 0.06) {
+          const w = 1 - (dist / 0.06);
+          if (w > maxWeight) {
+            maxWeight = w;
+            activeBeaconPos = b.pos;
+          }
+        }
+      });
+
+      const finalLook = new THREE.Vector3().copy(tLook);
+      if (activeBeaconPos && maxWeight > 0) {
+        // smoothstep/sine ease for focus transition
+        const easeW = gsap.utils.sineInOut(maxWeight);
+        finalLook.lerp(activeBeaconPos, easeW * 0.75); // Blend up to 75% gaze focus
+      }
+
       gsap.to(currentLookAt, {
-        x: tLook.x, y: tLook.y, z: tLook.z,
-        duration: 1.4, ease: 'power2.out', overwrite: 'auto',
+        x: finalLook.x, y: finalLook.y, z: finalLook.z,
+        duration: 1.2, ease: 'power2.out', overwrite: 'auto',
       });
 
       /* Elevation meter */
@@ -252,6 +329,9 @@ function setupScrollCamera() {
       document.querySelectorAll('.nav-dot').forEach((d, i) => {
         d.classList.toggle('active', i === idx);
       });
+      
+      // Dispatch scroll event for HUD triggers in main.js
+      window.dispatchEvent(new CustomEvent('portfolio-scroll', { detail: { t } }));
     },
   });
 }
@@ -278,6 +358,18 @@ function animate() {
       if (pos[i + 1] < -8) pos[i + 1] = 80;
     }
     snowParticles.geometry.attributes.position.needsUpdate = true;
+  }
+
+  /* Pulse milestone beacons */
+  if (milestoneBeacons && milestoneBeacons.length > 0) {
+    milestoneBeacons.forEach((b, idx) => {
+      const pulse = Math.sin(t * 3.5 + idx * 1.5) * 0.22 + 1.0;
+      b.ring.scale.set(pulse, pulse, pulse);
+      b.ring.material.opacity = Math.max(0.1, (0.6 - (pulse - 0.78)) * 0.85);
+      
+      const bounce = Math.sin(t * 5 + idx * 2) * 0.08 + 0.95;
+      b.sphere.scale.set(bounce, bounce, bounce);
+    });
   }
 
   /* Camera look-at */

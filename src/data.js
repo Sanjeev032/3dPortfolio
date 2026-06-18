@@ -5,43 +5,55 @@
 
 export const GITHUB_USERNAME = 'Sanjeev032';
 
-/* ── Career Timeline ── */
 export const milestones = [
   {
-    year: '2021',
-    role: 'CS Student — Foundations',
-    company: 'University',
-    description:
-      'Began the journey with programming fundamentals — DSA, OOP, web basics. Discovered a passion for building things that matter.',
-  },
-  {
     year: '2022',
-    role: 'Junior Developer',
-    company: 'Self Projects & Hackathons',
-    description:
-      'Built multiple full-stack apps, participated in hackathons. First real experience with React, Node.js, and database design.',
+    role: 'Started Programming',
+    company: 'Self-Discovery',
+    description: 'Began the journey with programming fundamentals, OOP concepts, logic building, and basic algorithms.',
+    pos: { x: 25, y: 15, z: 25 },
+    level: 'beginner'
   },
   {
     year: '2023',
-    role: 'Full Stack Developer',
-    company: 'Freelance & Open Source',
-    description:
-      'Delivered production web applications. Explored cloud platforms (AWS, Firebase), REST API design, and CI/CD pipelines.',
+    role: 'Learned JavaScript',
+    company: 'Web Foundations',
+    description: 'Mastered DOM manipulation, async programming, ES6+ features, and built interactive responsive websites.',
+    pos: { x: 15, y: 24, z: 18 },
+    level: 'intermediate'
   },
   {
     year: '2024',
-    role: 'AI Engineer (Emerging)',
-    company: 'Personal & Professional Projects',
-    description:
-      'Ventured into AI/ML — built AI-powered tools, integrated LLMs via APIs, explored RAG architectures and vector databases.',
+    role: 'Built First React Project',
+    company: 'Frontend Frameworks',
+    description: 'Learned state management, hooks, component lifecycle, routing, and deployed full client-side portals.',
+    pos: { x: 5, y: 33, z: 12 },
+    level: 'advanced'
   },
   {
-    year: '2025 →',
-    role: 'Full Stack Software Engineer · AI Engineer',
-    company: 'Current Focus',
-    description:
-      'Combining full-stack mastery with AI engineering — building intelligent, scalable systems that solve real-world problems.',
+    year: '2025',
+    role: 'MERN Development',
+    company: 'Full Stack Integration',
+    description: 'Built scalable web apps using MongoDB, Express, React, and Node.js, implementing RESTful APIs and secure auth.',
+    pos: { x: -8, y: 41, z: 5 },
+    level: 'production'
   },
+  {
+    year: '2025',
+    role: 'SDE Internship & Team Lead',
+    company: 'Professional Exposure',
+    description: 'Worked in professional sprints, managed codebase repositories, and mentored junior developers to build production features.',
+    pos: { x: 0, y: 47, z: -2 },
+    level: 'production'
+  },
+  {
+    year: '2026',
+    role: 'Graduated & Industry Projects',
+    company: 'Peak Mastery',
+    description: 'Graduated and scaled skills into building production-grade AI-integrated applications and highly responsive systems.',
+    pos: { x: 0, y: 53, z: -8 },
+    level: 'production'
+  }
 ];
 
 /* ── Experience Levels ── */
