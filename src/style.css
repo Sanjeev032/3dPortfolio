@@ -1891,3 +1891,18 @@ textarea {
     cursor: pointer;
   }
 }
+
+/* ── Tech Stack Icon Badges ── */
+.tag-pill.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tech-icon-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+}

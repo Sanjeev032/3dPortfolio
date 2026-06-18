@@ -119,11 +119,58 @@ function populateLevels() {
 /* ════════════════════════════════════════
    SCENE 4 — PROJECTS
 ════════════════════════════════════════ */
+/* Tech stack icon mapping for Devicons */
+const TECH_ALIASES = {
+  react: 'react',
+  nodejs: 'nodejs',
+  node: 'nodejs',
+  express: 'express',
+  mongodb: 'mongodb',
+  typescript: 'typescript',
+  javascript: 'javascript',
+  python: 'python',
+  fastapi: 'fastapi',
+  nextjs: 'nextjs',
+  next: 'nextjs',
+  stripe: 'stripe',
+  aws: 'amazonwebservices',
+  docker: 'docker',
+  postgresql: 'postgresql',
+  postgres: 'postgresql',
+  html: 'html5',
+  css: 'css3',
+  sass: 'sass',
+  tailwind: 'tailwindcss',
+  tailwindcss: 'tailwindcss',
+  vue: 'vuejs',
+  graphql: 'graphql',
+  git: 'git',
+  linux: 'linux',
+  vite: 'vitejs',
+  threejs: 'threejs'
+};
+
+function getTechBadge(t = '') {
+  const norm = t.toLowerCase().trim().replace(/[-_]/g, '');
+  const slug = TECH_ALIASES[norm] || TECH_ALIASES[t.toLowerCase()] || null;
+
+  if (slug) {
+    return `<span class="tag-pill tech-badge">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${slug}/${slug}-original.svg" 
+           alt="" 
+           class="tech-icon-img" 
+           onerror="this.remove()" />
+      ${t}
+    </span>`;
+  }
+  return `<span class="tag-pill">${t}</span>`;
+}
+
 function projectCard(p) {
   const langColor = getLangColor(p.language);
   const tags = [...(p.topics || []).slice(0, 3), p.language]
     .filter(Boolean)
-    .map(t => `<span class="tag-pill">${t}</span>`)
+    .map(getTechBadge)
     .join('');
 
   return /* html */`
@@ -252,7 +299,7 @@ function openModal(p) {
 
   document.getElementById('modal-tech').innerHTML =
     [...(p.topics || []), p.language].filter(Boolean)
-      .map(t => `<span class="tag-pill">${t}</span>`).join('');
+      .map(getTechBadge).join('');
 
   document.getElementById('modal-stars').textContent   = '';
   document.getElementById('modal-updated').textContent = p.updated;
