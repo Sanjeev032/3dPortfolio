@@ -12,7 +12,7 @@
   --bg: #080c10;
   --bg2: #0e1520;
   --bg3: #141e2e;
-  --card: rgba(10, 18, 30, 0.88);
+  --card: rgba(6, 10, 18, 0.9);
   --glass: rgba(220, 240, 255, 0.04);
 
   /* Primary accent — electric blue */
@@ -26,12 +26,12 @@
   --rose: #ff6b8a;
 
   /* Text — pure and crisp */
-  --text1: #f0f6ff;
-  --text2: #8faec8;
-  --text3: #3d5470;
+  --text1: #ffffff;
+  --text2: #d7e8ff;
+  --text3: #9fb5d1;
 
   /* Borders — icy blue tint */
-  --border: rgba(120, 180, 255, 0.14);
+  --border: rgba(255, 255, 255, 0.14);
   --border-glow: rgba(77, 184, 255, 0.5);
 
   /* Gradients */
@@ -50,7 +50,7 @@
   /* Glacial glow shadows */
   --shadow-glow: 0 0 36px rgba(77, 184, 255, 0.32);
   --shadow-purple: 0 0 36px rgba(200, 222, 255, 0.22);
-  --shadow-card: 0 8px 48px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 30px 80px rgba(0, 0, 0, 0.45);
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,6 +67,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -76,6 +77,20 @@ body {
   cursor: none;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+h3, .level-header h3, .stone-header h3, .summit-card h3, .modal-title {
+  font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
+  font-weight: 600 !important;
+  color: #4db8ff !important;
+  margin-bottom: 1.5rem !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+p, .arrival-description, .stone-description, .hud-desc, #modal-description {
+  font-size: 1rem !important;
+  line-height: 1.8 !important;
+  color: #d7e8ff !important;
 }
 
 a {
@@ -165,8 +180,8 @@ textarea {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 2rem;
-  background: rgba(6, 9, 18, 0.7);
-  backdrop-filter: blur(24px);
+  background: rgba(6, 10, 18, 0.88);
+  backdrop-filter: blur(32px);
   border-bottom: 1px solid var(--border);
   transition: background 0.3s;
 }
@@ -184,24 +199,41 @@ textarea {
 
 .nav-dots {
   display: flex;
-  gap: 0.625rem;
+  gap: 0;
   align-items: center;
 }
 
 .nav-dot {
+  /* 44×44px touch target (invisible) for WCAG compliance */
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  transition: all 0.25s var(--ease-smooth);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Visible 9px dot rendered via pseudo-element */
+.nav-dot::before {
+  content: '';
   width: 9px;
   height: 9px;
   border-radius: 50%;
   border: 1.5px solid var(--text3);
   background: transparent;
   transition: all 0.25s var(--ease-smooth);
-  position: relative;
+  flex-shrink: 0;
 }
 
 .nav-dot::after {
   content: attr(title);
   position: absolute;
-  bottom: -26px;
+  bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.6rem;
@@ -217,7 +249,7 @@ textarea {
   opacity: 1;
 }
 
-.nav-dot.active {
+.nav-dot.active::before {
   background: var(--cyan);
   border-color: var(--cyan);
   box-shadow: 0 0 10px rgba(0, 212, 255, 0.7);
@@ -307,9 +339,9 @@ textarea {
   max-width: calc(100vw - 5rem);
   z-index: 150;
   padding: 1.5rem;
-  background: rgba(8, 12, 16, 0.85);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  background: var(--card);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(77, 184, 255, 0.06);
@@ -433,20 +465,7 @@ textarea {
   transform: translateX(4px);
 }
 
-@media (max-width: 768px) {
-  .checkpoint-hud {
-    left: 1rem;
-    right: 1rem;
-    bottom: 4.5rem;
-    top: auto;
-    transform: translateY(140%);
-    width: auto;
-    max-width: none;
-  }
-  .checkpoint-hud.active {
-    transform: translateY(0);
-  }
-}
+/* HUD mobile layout → consolidated in RESPONSIVE section */
 
 /* ══════════════════════════
    RECRUITER NAV PANEL
@@ -457,9 +476,9 @@ textarea {
   top: 6rem;
   z-index: 180;
   width: 200px;
-  background: rgba(8, 12, 16, 0.82);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  background: var(--card);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 1.25rem 1rem;
@@ -530,43 +549,7 @@ textarea {
   filter: brightness(0.1);
 }
 
-@media (max-width: 768px) {
-  .recruiter-nav {
-    top: auto;
-    bottom: 1rem;
-    right: 1rem;
-    left: 1rem;
-    width: auto;
-    padding: 0.65rem 0.5rem;
-    z-index: 180;
-  }
-  .recruiter-nav-header {
-    display: none;
-  }
-  .recruiter-nav-links {
-    flex-direction: row;
-    justify-content: space-around;
-    gap: 0.25rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .recruiter-nav-links::-webkit-scrollbar {
-    display: none;
-  }
-  .recruiter-nav-btn {
-    padding: 0.45rem 0.55rem;
-    font-size: 0.75rem;
-    flex-direction: column;
-    gap: 0.2rem;
-    align-items: center;
-    min-width: 58px;
-    white-space: nowrap;
-    text-align: center;
-  }
-  .recruiter-nav-btn:hover {
-    transform: none;
-  }
-}
+/* Recruiter nav mobile layout → consolidated in RESPONSIVE section */
 
 /* ══════════════════════════
    SCROLL CONTAINER & SCENES
@@ -583,12 +566,15 @@ textarea {
   justify-content: center;
   padding: 7rem 2rem 4rem;
   position: relative;
+  background: linear-gradient(180deg, rgba(4,8,14,0.85), rgba(4,8,14,0.72));
 }
 
 .scene-content {
   max-width: 1100px;
   width: 100%;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* ══════════════════════════
@@ -597,7 +583,7 @@ textarea {
 .arrival-content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2.5rem;
   padding-left: clamp(0px, 5vw, 5rem);
 }
 
@@ -638,10 +624,13 @@ textarea {
 
 .arrival-title {
   font-family: var(--font-d);
-  font-size: clamp(3.2rem, 9vw, 6.5rem);
-  font-weight: 700;
+  font-size: clamp(3rem, 8vw, 6rem) !important;
+  font-weight: 800 !important;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
   line-height: 0.95;
   letter-spacing: -0.03em;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .title-word {
@@ -795,11 +784,13 @@ textarea {
 
 .section-title {
   font-family: var(--font-d);
-  font-size: clamp(2rem, 5.5vw, 3.8rem);
-  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3rem) !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
   line-height: 1.05;
   letter-spacing: -0.025em;
-  margin-bottom: 2.5rem;
+  margin-bottom: 3.5rem !important;
 }
 
 .section-title .accent {
@@ -897,7 +888,7 @@ textarea {
 ══════════════════════════ */
 .levels-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
   gap: 1.25rem;
 }
 
@@ -906,7 +897,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 1.75rem;
-  backdrop-filter: blur(22px);
+  backdrop-filter: blur(32px);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
   transition: all 0.3s var(--ease-smooth);
@@ -932,6 +924,11 @@ textarea {
   border-color: var(--cyan);
   transform: translateY(-6px);
   box-shadow: var(--shadow-glow);
+}
+
+.level-card:active {
+  transform: scale(0.98);
+  transition-duration: 0.1s;
 }
 
 .level-card:hover::before {
@@ -1027,6 +1024,13 @@ textarea {
   color: var(--cyan);
 }
 
+.filter-btn:active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  transform: scale(0.95);
+  transition-duration: 0.1s;
+}
+
 .filter-btn.active {
   background: var(--grad-accent);
   color: #fff;
@@ -1036,7 +1040,7 @@ textarea {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
   gap: 1.25rem;
 }
 
@@ -1045,7 +1049,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 1.4rem;
-  backdrop-filter: blur(22px);
+  backdrop-filter: blur(32px);
+  box-shadow: var(--shadow-card);
   transition: all 0.3s var(--ease-smooth);
   position: relative;
   overflow: hidden;
@@ -1062,6 +1067,11 @@ textarea {
   border-color: var(--cyan);
   transform: translateY(-6px);
   box-shadow: var(--shadow-glow);
+}
+
+.project-stone:active {
+  transform: scale(0.97);
+  transition-duration: 0.1s;
 }
 
 .project-stone::after {
@@ -1272,7 +1282,8 @@ textarea {
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 1.75rem;
-  backdrop-filter: blur(22px);
+  backdrop-filter: blur(32px);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.3s;
 }
 
@@ -1457,12 +1468,24 @@ textarea {
   backdrop-filter: blur(10px);
   transition: all 0.22s;
   text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  flex-wrap: wrap;
 }
 
 .social-link:hover {
   border-color: var(--cyan);
   background: rgba(0, 212, 255, 0.06);
   transform: translateX(4px);
+}
+
+.social-link:active {
+  background: rgba(0, 212, 255, 0.10);
+  border-color: var(--cyan);
+  transform: scale(0.98);
+  transition-duration: 0.1s;
 }
 
 .social-link svg {
@@ -1479,6 +1502,9 @@ textarea {
 .social-link small {
   font-size: 0.7rem;
   color: var(--text3);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
 }
 
 /* Footer */
@@ -1565,6 +1591,8 @@ textarea {
 .modal-header {
   padding: 2rem 2rem 1.5rem;
   border-bottom: 1px solid var(--border);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .modal-level-badge {
@@ -1686,6 +1714,7 @@ textarea {
   transform: translate(-50%, -50%);
   will-change: transform;
   transition: opacity 0.2s;
+  overflow: hidden;
 }
 
 #drone-cursor svg {
@@ -1828,24 +1857,90 @@ textarea {
   pointer-events: none !important;
 }
 
-/* ══════════════════════════
-   RESPONSIVE
-══════════════════════════ */
-@media (max-width:900px) {
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   1024px — Small Desktop / Landscape Tablet
+    768px — Tablet / Portrait
+    480px — Large Mobile
+    375px — Small Mobile (iPhone SE / 12 mini)
+══════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────
+   1024px — SMALL DESKTOP / LANDSCAPE TABLET
+────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* Layout */
+  .scene-content {
+    max-width: 900px;
+  }
+
+  .scene {
+    padding: 6.5rem 1.75rem 3.5rem;
+  }
+
+  /* Navigation */
+  #floating-nav {
+    padding: 0.9rem 1.5rem;
+  }
+
+  /* Arrival hero */
+  .arrival-content {
+    padding-left: clamp(0px, 3vw, 3rem);
+  }
+
+  /* Summit grid — narrow 2-col */
   .summit-grid {
-    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Recruiter nav — tighter fit */
+  .recruiter-nav {
+    right: 1.25rem;
+    width: 180px;
+    padding: 1rem 0.85rem;
+  }
+
+  .recruiter-nav-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
   }
 }
 
-@media (max-width:700px) {
+/* ─────────────────────────────────────
+   768px — TABLET / PORTRAIT
+────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Layout */
+  .scene {
+    padding: 6rem 1.5rem 3rem;
+  }
+
+  .scene-content {
+    max-width: 100%;
+  }
+
+  /* Scroll container — offset for bottom nav */
+  #scroll-container {
+    padding-bottom: 4.5rem;
+  }
+
+  /* Navigation — reduce blur for performance */
+  #floating-nav {
+    padding: 0.9rem 1.25rem;
+    backdrop-filter: blur(16px);
+  }
+
+  /* Arrival hero */
   .arrival-content {
     padding-left: 0;
   }
 
-  #elevation-meter {
-    display: none;
+  /* Summit grid — single column */
+  .summit-grid {
+    grid-template-columns: 1fr;
   }
 
+  /* Grids — force single column */
   .levels-grid {
     grid-template-columns: 1fr;
   }
@@ -1854,30 +1949,524 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  /* Elevation meter — hide on tablet */
+  #elevation-meter {
+    display: none;
+  }
+
+  /* Checkpoint HUD — move to bottom sheet */
+  .checkpoint-hud {
+    left: 1rem;
+    right: 1rem;
+    bottom: 4.5rem;
+    top: auto;
+    transform: translateY(140%);
+    width: auto;
+    max-width: none;
+    backdrop-filter: blur(14px);
+  }
+
+  .checkpoint-hud.active {
+    transform: translateY(0);
+  }
+
+  /* Recruiter nav — bottom bar layout */
+  .recruiter-nav {
+    top: auto;
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    padding: 0.65rem 0.5rem;
+    z-index: 180;
+    backdrop-filter: blur(14px);
+  }
+
+  .recruiter-nav-header {
+    display: none;
+  }
+
+  .recruiter-nav-links {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .recruiter-nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .recruiter-nav-btn {
+    padding: 0.45rem 0.55rem;
+    font-size: 0.75rem;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: center;
+    min-width: 58px;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .recruiter-nav-btn:hover {
+    transform: none;
+  }
+
+  /* Cards — reduce backdrop-filter for GPU perf */
+  .project-stone,
+  .level-card,
+  .summit-card,
+  .checkpoint-hud,
+  .recruiter-nav,
+  #floating-nav {
+    backdrop-filter: blur(16px);
+  }
+
+  /* Modal — stacked action buttons */
   .modal-actions {
     flex-direction: column;
   }
 
   .modal-stats-row {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Section title */
+  .section-title {
+    margin-bottom: 2rem;
+  }
+
+  /* Tech cloud — slightly tighter */
+  .tech-cloud {
+    gap: 0.35rem;
+  }
+
+  .tech-pill {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.55rem;
   }
 }
 
-@media (max-width:480px) {
+/* ─────────────────────────────────────
+   480px — LARGE MOBILE
+────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Layout */
   .scene {
-    padding: 6rem 1rem 3rem;
+    padding: 5.5rem 0.75rem 3rem;
   }
 
+  /* Navigation */
   #floating-nav {
-    padding: 0.85rem 1rem;
+    padding: 0.85rem 0.75rem;
   }
 
   .nav-github span {
     display: none;
   }
+
+  /* Arrival hero */
+  .arrival-content {
+    gap: 1rem;
+  }
+
+  .arrival-description {
+    font-size: 0.875rem;
+  }
+
+  .arrival-badge {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.75rem;
+  }
+
+  /* Section titles */
+  .section-title {
+    margin-bottom: 1.75rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.875rem;
+  }
+
+  /* Level cards */
+  .level-card {
+    padding: 1.25rem;
+  }
+
+  /* Project stones */
+  .project-stone {
+    padding: 1.1rem;
+  }
+
+  .stone-header h3 {
+    font-size: 1rem;
+  }
+
+  /* Filter buttons */
+  .projects-filter {
+    gap: 0.45rem;
+  }
+
+  .filter-btn {
+    font-size: 0.72rem;
+    padding: 0.32rem 0.75rem;
+  }
+
+  /* Summit */
+  .summit-card {
+    padding: 1.25rem;
+  }
+
+  .summit-card h3 {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Social links */
+  .social-link {
+    gap: 0.5rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .social-link small {
+    font-size: 0.62rem;
+  }
+
+  .social-link span {
+    font-size: 0.8rem;
+  }
+
+  /* Skills */
+  .skill-header {
+    font-size: 0.78rem;
+  }
+
+  .stat-value {
+    font-size: 1.35rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  /* Recruiter nav */
+  .recruiter-nav-btn {
+    min-width: 50px;
+    font-size: 0.68rem;
+    padding: 0.42rem 0.4rem;
+  }
+
+  /* Modal */
+  .modal-header {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem 1rem 1.25rem;
+  }
+
+  .modal-card {
+    border-radius: var(--r-md);
+    max-height: 92vh;
+  }
+
+  .modal-close {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 30px;
+    height: 30px;
+  }
+
+  #modal-title {
+    font-size: 1.15rem;
+  }
+
+  #modal-description {
+    font-size: 0.82rem;
+  }
+
+  .modal-stat span {
+    font-size: 0.85rem;
+  }
+
+  /* Checkpoint HUD */
+  .checkpoint-hud {
+    padding: 1rem;
+  }
+
+  .hud-year {
+    font-size: 1.3rem;
+  }
+
+  .hud-title {
+    font-size: 1rem;
+  }
+
+  .hud-desc {
+    font-size: 0.8rem;
+  }
+
+  .hud-company {
+    font-size: 0.7rem;
+  }
+
+  /* Timeline */
+  .timeline-dot {
+    width: 10px;
+    height: 10px;
+  }
 }
 
-@media (hover:none) {
+/* ─────────────────────────────────────
+   375px — SMALL MOBILE (iPhone SE / 12 mini)
+────────────────────────────────────── */
+@media (max-width: 375px) {
+  /* Layout — minimal padding */
+  .scene {
+    padding: 5rem 0.5rem 2.5rem;
+  }
+
+  /* Navigation */
+  #floating-nav {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .nav-brand {
+    font-size: 1rem;
+  }
+
+  /* Hero — compact */
+  .arrival-content {
+    gap: 0.75rem;
+  }
+
+  .arrival-title {
+    font-size: clamp(2rem, 8.5vw, 3.5rem);
+    line-height: 0.92;
+  }
+
+  .arrival-subtitle {
+    font-size: 0.88rem;
+  }
+
+  .arrival-description {
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .arrival-badge {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  /* Buttons — narrower */
+  .btn {
+    padding: 0.55rem 1.25rem;
+    font-size: 0.78rem;
+  }
+
+  /* Section titles */
+  .section-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+  }
+
+  .section-title {
+    margin-bottom: 1.5rem;
+    font-size: clamp(1.6rem, 5vw, 2.5rem);
+  }
+
+  .section-subtitle {
+    font-size: 0.82rem;
+  }
+
+  /* Level cards — compact */
+  .level-card {
+    padding: 1rem;
+  }
+
+  .level-header h3 {
+    font-size: 1rem;
+  }
+
+  .level-exp {
+    font-size: 0.6rem;
+  }
+
+  /* Project stones — compact */
+  .project-stone {
+    padding: 0.9rem;
+  }
+
+  .stone-header h3 {
+    font-size: 0.92rem;
+  }
+
+  .stone-description {
+    font-size: 0.78rem;
+  }
+
+  .tag-pill {
+    font-size: 0.58rem;
+    padding: 0.15rem 0.45rem;
+  }
+
+  /* Filter buttons — tighter */
+  .projects-filter {
+    gap: 0.35rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-btn {
+    font-size: 0.68rem;
+    padding: 0.28rem 0.6rem;
+  }
+
+  /* Summit cards — compact */
+  .summit-card {
+    padding: 1rem;
+  }
+
+  .summit-card h3 {
+    font-size: 0.8rem;
+    margin-bottom: 0.85rem;
+  }
+
+  /* Social links — compact */
+  .social-link {
+    gap: 0.4rem;
+    padding: 0.45rem 0.55rem;
+  }
+
+  .social-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .social-link span {
+    font-size: 0.75rem;
+  }
+
+  .social-link small {
+    font-size: 0.58rem;
+  }
+
+  /* Skills — compact */
+  .skills-list {
+    gap: 0.5rem;
+  }
+
+  .skill-header {
+    font-size: 0.72rem;
+  }
+
+  .skill-pct {
+    font-size: 0.65rem;
+  }
+
+  .stat-value {
+    font-size: 1.15rem;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+  }
+
+  /* Tech pills — smaller */
+  .tech-pill {
+    font-size: 0.6rem;
+    padding: 0.18rem 0.5rem;
+  }
+
+  /* Recruiter nav — ultra-compact */
+  .recruiter-nav-btn {
+    min-width: 42px;
+    font-size: 0.6rem;
+    padding: 0.35rem 0.25rem;
+    gap: 0.15rem;
+  }
+
+  .recruiter-nav-btn .btn-icon {
+    font-size: 0.85rem;
+  }
+
+  /* Modal — full-width feel */
+  .modal {
+    padding: 0.5rem;
+  }
+
+  .modal-header {
+    padding: 1rem 0.85rem 0.85rem;
+  }
+
+  .modal-body {
+    padding: 0.85rem 0.85rem 1rem;
+  }
+
+  .modal-card {
+    border-radius: var(--r-sm);
+    max-height: 94vh;
+  }
+
+  #modal-title {
+    font-size: 1.05rem;
+  }
+
+  #modal-description {
+    font-size: 0.78rem;
+  }
+
+  .modal-stat span {
+    font-size: 0.8rem;
+  }
+
+  .modal-stat small {
+    font-size: 0.58rem;
+  }
+
+  .modal-actions a {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Checkpoint HUD — minimal */
+  .checkpoint-hud {
+    padding: 0.85rem;
+  }
+
+  .hud-year {
+    font-size: 1.15rem;
+  }
+
+  .hud-title {
+    font-size: 0.9rem;
+  }
+
+  .hud-desc {
+    font-size: 0.75rem;
+    line-height: 1.45;
+  }
+
+  .hud-company {
+    font-size: 0.65rem;
+  }
+
+  .hud-badge {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  /* Footer */
+  .portfolio-footer p {
+    font-size: 0.7rem;
+  }
+}
+
+/* ─────────────────────────────────────
+   HOVER: NONE — Touch devices
+────────────────────────────────────── */
+@media (hover: none) {
   #drone-cursor {
     display: none;
   }
@@ -1905,4 +2494,114 @@ textarea {
   object-fit: contain;
   display: inline-block;
   vertical-align: middle;
+}
+/* --------------------------
+   MODE TOGGLE BUTTON
+-------------------------- */
+.mode-toggle {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 2rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text1);
+  font-family: var(--font-d);
+  font-size: 0.85rem;
+  font-weight: 600;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s var(--ease-spring);
+}
+.mode-toggle:hover {
+  border-color: var(--cyan);
+  transform: translateY(-2px);
+  background: rgba(77, 184, 255, 0.1);
+}
+.mode-toggle .mode-icon {
+  font-size: 1.1rem;
+}
+
+/* --------------------------
+   RECRUITER MODE OVERRIDES
+-------------------------- */
+body.recruiter-mode {
+  background: radial-gradient(circle at top center, #0d1627 0%, var(--bg) 100%);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Hide Immersive Elements */
+body.recruiter-mode #canvas-container,
+body.recruiter-mode #elevation-meter,
+body.recruiter-mode #checkpoint-hud,
+body.recruiter-mode #scroll-progress-bar,
+body.recruiter-mode .scroll-hint {
+  display: none !important;
+}
+
+/* Standardize Layout */
+body.recruiter-mode #scroll-container {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 4rem;
+  padding-top: 5rem;
+}
+
+body.recruiter-mode .scene {
+  min-height: auto;
+  padding: 2.5rem 1.5rem !important;
+  background: none !important;
+}
+body.recruiter-mode .scene::before {
+  display: none !important;
+}
+
+/* Force All Animations to Completed State */
+body.recruiter-mode .timeline-item,
+body.recruiter-mode .level-card,
+body.recruiter-mode .summit-card,
+body.recruiter-mode .project-stone,
+body.recruiter-mode .summit-flag svg,
+body.recruiter-mode .arrival-title .title-word,
+body.recruiter-mode .arrival-subtitle,
+body.recruiter-mode .arrival-description,
+body.recruiter-mode .arrival-actions,
+body.recruiter-mode .skill-fill {
+  opacity: 1 !important;
+  transform: none !important;
+  visibility: visible !important;
+  filter: blur(0px) !important;
+  width: auto; /* for skill fills, let inline styles override */
+}
+
+/* Simplify Recruiter Nav */
+body.recruiter-mode #recruiter-nav {
+  position: fixed;
+  top: auto;
+  bottom: 2rem;
+  right: 2rem;
+}
+
+@media (max-width: 768px) {
+  .mode-toggle {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 0.85rem;
+  }
+  .mode-toggle .mode-text {
+    display: none;
+  }
+  body.recruiter-mode #recruiter-nav {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
 }

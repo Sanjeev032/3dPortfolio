@@ -11,6 +11,9 @@ import { milestones } from './data.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* ── Mobile detection ── */
+const isMobile = window.innerWidth < 768;
+
 /* ── Module-level refs ── */
 let renderer, scene, camera;
 let snowParticles, animId;
@@ -49,7 +52,7 @@ function fBm(x, z, octaves = 6) {
    Mountain Terrain
 ──────────────────────────────────────────────── */
 function buildTerrain() {
-  const SIZE = 220, SEGS = 160;
+  const SIZE = 220, SEGS = isMobile ? 80 : 160; // Reduced subdivision on mobile
   const geo = new THREE.PlaneGeometry(SIZE, SIZE, SEGS, SEGS);
   geo.rotateX(-Math.PI / 2);
 
@@ -124,6 +127,7 @@ function buildSnow(count = 2200) {
    Star Field
 ──────────────────────────────────────────────── */
 function buildStars(count = 3500) {
+  if (isMobile) count = count * 0.5; // Reduce starfield by 50%
   const pos = [];
   for (let i = 0; i < count; i++) {
     const theta = Math.random() * Math.PI * 2;
@@ -235,9 +239,9 @@ const LOOK_PATH = [
 ──────────────────────────────────────────────── */
 export function initScene(canvas) {
   /* Renderer */
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+  renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1.5) : Math.min(window.devicePixelRatio, 1.8));
   renderer.toneMapping       = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.3;
 
@@ -247,7 +251,8 @@ export function initScene(canvas) {
   scene.fog = new THREE.FogExp2(0x080c10, 0.007); // Distant-only thin fog
 
   /* Camera */
-  camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 900);
+  const farPlane = isMobile ? 400 : 900; // Reduce render distance
+  camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, farPlane);
   camera.position.copy(CAM_PATH[0]);
   camera.lookAt(LOOK_PATH[0]);
 
@@ -257,6 +262,10 @@ export function initScene(canvas) {
 
   sunLight = new THREE.DirectionalLight(0xc8e8ff, 2.8);   // stable icy white sun sun
   sunLight.position.set(60, 90, 40);
+  if (isMobile) {
+    sunLight.shadow.mapSize.width = 512;
+    sunLight.shadow.mapSize.height = 512;
+  }
   scene.add(sunLight);
 
   // Primary peak light
@@ -278,11 +287,15 @@ export function initScene(canvas) {
   scene.add(buildStars());
   scene.add(buildTerrain());
   scene.add(buildMilestoneBeacons());
-  snowParticles = buildSnow();
+  snowParticles = buildSnow(isMobile ? 880 : 2200); // 60% reduction (2200 * 0.4)
   scene.add(snowParticles);
 
-  /* Resize */
-  window.addEventListener('resize', onResize);
+  /* Resize — debounced to prevent jank on mobile orientation changes */
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(onResize, 200);
+  });
 
   /* Scroll-driven camera */
   setupScrollCamera();

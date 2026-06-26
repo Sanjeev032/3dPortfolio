@@ -51,6 +51,7 @@ async function init() {
   setupContactForm();
   setupCheckpointHUD();
   setupRecruiterNav();
+  setupModeToggle();
 
   /* 5 — Hide loading screen & entrance */
   setTimeout(() => {
@@ -636,6 +637,45 @@ function updateRecruiterActiveState() {
 ════════════════════════════════════════ */
 function prettify(name = '') {
   return name.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function setupModeToggle() {
+  const toggleBtn = document.getElementById('mode-toggle');
+  if (!toggleBtn) return;
+
+  const textSpan = toggleBtn.querySelector('.mode-text');
+  const iconSpan = toggleBtn.querySelector('.mode-icon');
+
+  const savedMode = localStorage.getItem('sanjeev_portfolio_mode') || 'immersive';
+  
+  const applyMode = (mode) => {
+    if (mode === 'recruiter') {
+      document.body.classList.add('recruiter-mode');
+      if (textSpan) textSpan.textContent = 'Immersive Mode';
+      if (iconSpan) iconSpan.textContent = '🏔️';
+      toggleBtn.classList.add('active');
+    } else {
+      document.body.classList.remove('recruiter-mode');
+      if (textSpan) textSpan.textContent = 'Recruiter Mode';
+      if (iconSpan) iconSpan.textContent = '⚡';
+      toggleBtn.classList.remove('active');
+    }
+    
+    // Give DOM a frame to update before refreshing ScrollTrigger
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
+  };
+
+  applyMode(savedMode);
+
+  toggleBtn.addEventListener('click', () => {
+    const isRecruiter = document.body.classList.contains('recruiter-mode');
+    const newMode = isRecruiter ? 'immersive' : 'recruiter';
+    localStorage.setItem('sanjeev_portfolio_mode', newMode);
+    applyMode(newMode);
+  });
 }
 
 /* ════════════════════════════════════════
